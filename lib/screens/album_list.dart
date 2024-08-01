@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../widgets/album_card.dart';
+import '../widgets/add_button.dart';
+
 import '../models/album.dart';
 import '../services/album_service.dart';
 
@@ -57,23 +59,30 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else if (snapshot.hasData) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minHeight: constraints.maxHeight),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: albums.map((album) {
-                            return AlbumCard(
-                              text: album.title,
-                              albumId: album.id,
-                              onDelete: () => removeAlbum(album.id),
-                            );
-                          }).toList(),
+                    return Stack(children: [
+                      SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints:
+                              BoxConstraints(minHeight: constraints.maxHeight),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: albums.map((album) {
+                              return AlbumCard(
+                                text: album.title,
+                                albumId: album.id,
+                                onDelete: () => removeAlbum(album.id),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-                    );
+                      const Positioned(
+                        bottom: 16,
+                        right: 16,
+                        child: AddButton(),
+                      ),
+                    ]);
                   } else {
                     return const Text("No data available");
                   }

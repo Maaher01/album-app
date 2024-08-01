@@ -26,7 +26,7 @@ class AlbumService {
     );
 
     if (response.statusCode == 201) {
-      return Album.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      return Album.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to create album');
     }
