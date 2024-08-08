@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'package:album_app/screens/album_edit.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/album_card.dart';
 import '../widgets/add_button.dart';
-
 import '../models/album.dart';
 import '../services/album_service.dart';
 
@@ -22,11 +22,19 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
   @override
   void initState() {
     super.initState();
-    futureAlbums = _albumService.fetchAlbums();
-    futureAlbums.then((data) {
-      setState(() {
-        albums = data;
-      });
+    fetchAlbums();
+  }
+
+  Future<void> fetchAlbums() async {
+    final data = await _albumService.fetchAlbums();
+    setState(() {
+      albums = data;
+    });
+  }
+
+  void addAlbum(Album album) {
+    setState(() {
+      albums.insert(0, album);
     });
   }
 
@@ -36,60 +44,70 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
     });
   }
 
+  Future<void> editAlbum(int albumId, String title) async {
+    final updatedAlbum = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AlbumEditScreen(
+          albumId: albumId,
+          title: title,
+        ),
+      ),
+    );
+
+    if (updatedAlbum != null) {
+      fetchAlbums();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'All Albums',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text('All Albums'),
-          ),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return FutureBuilder<List<Album>>(
-                future: futureAlbums,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Show a loading spinner.
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    return Stack(children: [
-                      SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints:
-                              BoxConstraints(minHeight: constraints.maxHeight),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: albums.map((album) {
-                              return AlbumCard(
-                                text: album.title,
-                                albumId: album.id,
-                                onDelete: () => removeAlbum(album.id),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('All Albums'),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return FutureBuilder<List<Album>>(
+            future: futureAlbums,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Show a loading spinner.
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              } else if (snapshot.hasData) {
+                return Stack(children: [
+                  SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: albums.map((album) {
+                          return AlbumCard(
+                            title: album.title,
+                            albumId: album.id,
+                            onDelete: () => removeAlbum(album.id),
+                            onEdit: () => editAlbum(album.id, album.title),
+                          );
+                        }).toList(),
                       ),
-                      const Positioned(
-                        bottom: 16,
-                        right: 16,
-                        child: AddButton(),
-                      ),
-                    ]);
-                  } else {
-                    return const Text("No data available");
-                  }
-                },
-              );
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: AddButton(onAlbumAdded: addAlbum),
+                  ),
+                ]);
+              } else {
+                return const Text("No data available");
+              }
             },
-          ),
-        ));
+          );
+        },
+      ),
+    );
   }
 }

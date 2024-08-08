@@ -4,15 +4,18 @@ import '../services/album_service.dart';
 class AlbumCard extends StatelessWidget {
   final AlbumService _albumService = AlbumService();
 
-  AlbumCard(
-      {super.key,
-      required this.text,
-      required this.albumId,
-      required this.onDelete});
+  AlbumCard({
+    super.key,
+    required this.title,
+    required this.albumId,
+    required this.onDelete,
+    required this.onEdit,
+  });
 
-  final String text;
+  final String title;
   final int albumId;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +29,14 @@ class AlbumCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     style: const TextStyle(fontSize: 14.5),
-                    text,
+                    title,
                     softWrap: true,
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Icon(
-                  Icons.create,
-                  color: Colors.green,
+                IconButton(
+                  icon: const Icon(Icons.create, color: Colors.green),
+                  onPressed: onEdit,
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),

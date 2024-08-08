@@ -17,26 +17,22 @@ class _AlbumAddScreenState extends State<AlbumAddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'New Album',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('New Album'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('New Album'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8),
-          child: (_futureAlbum == null) ? buildColumn() : buildFutureBuilder(),
-        ),
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8),
+        child: (_futureAlbum == null)
+            ? buildColumn()
+            : buildFutureBuilder(context),
       ),
     );
   }
@@ -60,17 +56,23 @@ class _AlbumAddScreenState extends State<AlbumAddScreen> {
     );
   }
 
-  FutureBuilder<Album> buildFutureBuilder() {
+  FutureBuilder<Album> buildFutureBuilder(BuildContext context) {
     return FutureBuilder<Album>(
       future: _futureAlbum,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Text(snapshot.data!.title);
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
+        } else if (snapshot.hasData) {
+          // Pass the newly created album back to the previous screen
+          Future.microtask(() {
+            Navigator.pop(context, snapshot.data);
+          });
+          return const SizedBox.shrink();
+        } else {
+          return const SizedBox.shrink();
         }
-
-        return const CircularProgressIndicator();
       },
     );
   }
