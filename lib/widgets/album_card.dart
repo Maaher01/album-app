@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/album_service.dart';
+import '../widgets/delete_dialog.dart';
 
 class AlbumCard extends StatelessWidget {
   final AlbumService _albumService = AlbumService();
@@ -40,9 +41,18 @@ class AlbumCard extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
+                  // onPressed: () async {
+                  //   await _albumService.deleteAlbum(albumId);
+                  //   onDelete();
+                  // },
                   onPressed: () async {
-                    await _albumService.deleteAlbum(albumId);
-                    onDelete();
+                    final bool? toDelete =
+                        await showConfirmationDialog(context);
+
+                    if (toDelete == true) {
+                      await _albumService.deleteAlbum(albumId);
+                      onDelete();
+                    }
                   },
                 )
               ],
