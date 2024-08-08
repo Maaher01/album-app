@@ -22,14 +22,15 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
   @override
   void initState() {
     super.initState();
-    fetchAlbums();
+    futureAlbums = fetchAlbums();
   }
 
-  Future<void> fetchAlbums() async {
+  Future<List<Album>> fetchAlbums() async {
     final data = await _albumService.fetchAlbums();
     setState(() {
       albums = data;
     });
+    return data;
   }
 
   void addAlbum(Album album) {
@@ -55,7 +56,12 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
     );
 
     if (updatedAlbum != null) {
-      fetchAlbums();
+      setState(() {
+        final index = albums.indexWhere((album) => album.id == albumId);
+        if (index != -1) {
+          albums[index] = updatedAlbum as Album;
+        }
+      });
     }
   }
 

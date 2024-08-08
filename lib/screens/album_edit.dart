@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../models/album.dart';
 import '../services/album_service.dart';
 
 class AlbumEditScreen extends StatefulWidget {
@@ -16,14 +14,18 @@ class AlbumEditScreen extends StatefulWidget {
 
 class _AlbumEditScreenState extends State<AlbumEditScreen> {
   late TextEditingController _controller;
-  Future<Album>? _futureAlbum;
   final AlbumService _albumService = AlbumService();
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.title);
-    _futureAlbum = _albumService.fetchAlbum(widget.albumId);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,30 +41,26 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
         ),
       ),
       body: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8),
-          child: buildColumn()),
-    );
-  }
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                controller: _controller,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    final updatedAlbum = await _albumService.updateAlbum(
+                        widget.albumId, _controller.text);
 
-  Column buildColumn() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        TextField(
-          controller: _controller,
-        ),
-        ElevatedButton(
-            onPressed: () async {
-              final updatedAlbum = await _albumService.updateAlbum(
-                  widget.albumId, _controller.text);
-
-              if (mounted) {
-                Navigator.pop(context, updatedAlbum);
-              }
-            },
-            child: const Text('Submit'))
-      ],
+                    if (mounted) {
+                      Navigator.pop(context, updatedAlbum);
+                    }
+                  },
+                  child: const Text('Submit')),
+            ]),
+      ),
     );
   }
 }
