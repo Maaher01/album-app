@@ -59,10 +59,7 @@ class AlbumService {
     }
   }
 
-  Future<Album> updateAlbum(
-    int id,
-    String title,
-  ) async {
+  Future<Album> updateAlbum(int id, String title) async {
     final response = await http.put(
       Uri.parse('https://jsonplaceholder.typicode.com/albums/$id'),
       headers: <String, String>{

@@ -41,10 +41,6 @@ class AlbumCard extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  // onPressed: () async {
-                  //   await _albumService.deleteAlbum(albumId);
-                  //   onDelete();
-                  // },
                   onPressed: () async {
                     final bool? toDelete =
                         await showConfirmationDialog(context);

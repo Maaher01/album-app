@@ -48,10 +48,7 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
   Future<void> editAlbum(int albumId, String title) async {
     final updatedAlbum = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AlbumEditScreen(
-          albumId: albumId,
-          title: title,
-        ),
+        builder: (context) => AlbumEditScreen(albumId: albumId, title: title),
       ),
     );
 
@@ -77,7 +74,6 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
             future: futureAlbums,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                // Show a loading spinner.
                 return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
